@@ -1,5 +1,10 @@
 #!/bin/bash
-cat <<EOF > /etc/yum.repos.d/local.repo
+
+# Define the output file
+REPO_FILE="/etc/yum.repos.d/local.repo"
+
+# Create the file with the required contents
+cat <<EOF > "$REPO_FILE"
 [BaseOS]
 name=BaseOS
 baseurl=file:///cd/BaseOS
@@ -14,4 +19,6 @@ gpgcheck=0
 EOF
 
 mkdir /cd
-mount /dev/sr0 /cd/
+mount /dev/sr0 /cd
+# Confirm completion
+echo "Repository file '$REPO_FILE' has been created."
