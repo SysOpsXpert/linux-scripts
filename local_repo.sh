@@ -1,4 +1,4 @@
-#!bin/bash
+#!/bin/bash
 cat <<EOF > /etc/yum.repos.d/local.repo
 [BaseOS]
 name=BaseOS
