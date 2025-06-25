@@ -5,7 +5,7 @@ set -e
 echo "📦 Installing Apache Guacamole via Docker Compose..."
 
 # 1. Create working directory
-#mkdir -p ~/guacamole-docker
+mkdir -p /guacamole-docker
 cd /guacamole-docker
 
 # 2. Create docker-compose.yml
