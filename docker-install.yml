@@ -1,0 +1,73 @@
+---
+- name: Install Docker from local RPM tarball
+  hosts: 10.0.1.49
+  become: yes
+  vars:
+    docker_tarball_path: "/etc/ansible/files/docker-rpm.tar"  # Local path to your tarball
+    remote_temp_dir: "/tmp/docker_rpms"  # Remote directory to extract RPMs
+    #    docker_packages:
+    #  - "containerd.io"  # Example package names - adjust based on your actual RPMs
+    #  - "docker-ce"
+    #  - "docker-ce-cli"
+    #  - "docker-buildx-plugin"
+    #  - "docker-compose-plugin"
+
+  tasks:
+    - name: Create temporary directory for RPM files
+      ansible.builtin.file:
+        path: "{{ remote_temp_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Transfer the Docker RPM tarball to target servers
+      ansible.builtin.copy:
+        src: "{{ docker_tarball_path }}"
+        dest: "{{ remote_temp_dir }}/docker-rpm.tar"
+        mode: '0644'
+
+    - name: Extract the Docker RPM tarball
+      ansible.builtin.unarchive:
+        src: "{{ remote_temp_dir }}/docker-rpm.tar"
+        dest: "{{ remote_temp_dir }}"
+        remote_src: yes
+        #        extra_opts:
+        # - "--strip-components=1"  # Adjust if your tarball has nested directories
+
+    - name: remove old docker and podman 
+      shell: sudo dnf remove docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine podman runc -y
+
+          
+    - name: Install all RPM packages from the extracted directory
+      shell: yum localinstall /tmp/docker_rpms/docker-rpm/*.rpm -y
+   
+      #    - name: Install all RPM packages from the extracted directory
+      #yum:
+      #name: /tmp/docker_rpms/docker-rpm/*.rpm
+      #state: present 
+
+      #    - name: Install all RPM packages from the extracted directory
+      #ansible.builtin.yum:
+      #  name: "{{ remote_temp_dir }}/docker-rpm/*.rpm"
+      #  disable_gpg_check: yes  # Only use if you trust the packages
+      #  state: present
+
+    - name: Start and enable Docker service
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Verify Docker installation
+      ansible.builtin.command: docker --version
+      register: docker_version
+      changed_when: false
+
+    - name: Display Docker version
+      ansible.builtin.debug:
+        var: docker_version.stdout
+
+    - name: Clean up temporary RPM files (optional)
+      ansible.builtin.file:
+        path: "{{ remote_temp_dir }}"
+        state: absent
+      when: false  # Set to true if you want to remove the files after installation
