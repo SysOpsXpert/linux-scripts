@@ -61,6 +61,7 @@ until docker exec guac-db mysqladmin ping -h "localhost" --silent; do
   sleep 2
 done
 
+cd /guacamole-docker
 # 4. Download and run initdb.sql
 echo "📄 Initializing Guacamole database schema..."
 docker run --rm guacamole/guacamole /opt/guacamole/bin/initdb.sh --mysql > initdb.sql
