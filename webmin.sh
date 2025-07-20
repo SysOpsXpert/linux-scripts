@@ -1,5 +1,4 @@
 #!/bin/bash
-curl -fsSL setup-repos.sh https://raw.githubusercontent.com/webmin/webmin/master/setup-repos.sh -o setup-repos.sh
-chmod +x setup-repos.sh
-sh setup-repos.sh
-yum install webmin -y
+curl -o webmin-setup-repo.sh https://raw.githubusercontent.com/webmin/webmin/master/webmin-setup-repo.sh
+sh webmin-setup-repo.sh
+yum install webmin
